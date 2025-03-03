@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario</title>
+    <style>
+        body { background-color: #1a1a1a; color: white; font-family: Arial, sans-serif; text-align: center; }
+        .container { max-width: 400px; margin: 50px auto; padding: 20px; background: #333; border-radius: 10px; }
+        button { margin: 5px; padding: 10px; width: 100%; background: #a00; color: white; border: none; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #c00; }
+    </style>
+</head>
+<body>
+    <div class="container" id="quiz-container">
+        <h2 id="question">Pregunta</h2>
+        <div id="options"></div>
+        <p id="countdown" style="display:none; font-size: 18px; margin-top: 10px;"></p>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "(Sin calculadora) Raiz cubica de 27" , options: ["2", "3,6", "2,5", "3"], a: "3" },
+            { q: "Edad de Lilith y Vivi", options: ["3", "4", "5", "6"], a: "4" },
+            { q: "Mejor personaje de Naruto", options: ["Madara", "Sasuke", "Itachi", "Kakashi"], a: "Itachi" },
+            { q: "Anime disque bueno pero mas largo que una dictadura", options: ["Naruto", "One piece", "Bleach", "Saint Seiya"], a: "One piece" },
+            { q: "¿Gabriel ya se graduó?", options: ["No", "Sí"], a: "No" }
+        ];
+
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const countdownEl = document.getElementById("countdown");
+        
+        function loadQuestion() {
+            if (currentQuestion < questions.length) {
+                questionEl.textContent = questions[currentQuestion].q;
+                optionsEl.innerHTML = "";
+                questions[currentQuestion].options.forEach(option => {
+                    const btn = document.createElement("button");
+                    btn.textContent = option;
+                    btn.onclick = () => checkAnswer(option);
+                    optionsEl.appendChild(btn);
+                });
+            } else if (correctAnswers >= 3) {
+                loadFinalQuestion();
+            } else {
+                questionEl.textContent = "Muy mala, intenta de nueva jajajajaja Loser";
+                optionsEl.innerHTML = "";
+            }
+        }
+
+        function checkAnswer(option) {
+            if (option === questions[currentQuestion].a) correctAnswers++;
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function loadFinalQuestion() {
+            questionEl.textContent = "¿Vendrás a mi casa hoy?";
+            optionsEl.innerHTML = "";
+            ["Sí", "No"].forEach(option => {
+                const btn = document.createElement("button");
+                btn.textContent = option;
+                btn.onclick = () => handleFinalAnswer(option);
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        function handleFinalAnswer(option) {
+            if (option === "No") {
+                alert("Respuesta incorrecta");
+                loadFinalQuestion();
+            } else {
+                startCountdown();
+            }
+        }
+
+        function startCountdown() {
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(23, 59, 59, 999);
+            let seconds = Math.floor((midnight - now) / 1000);
+            
+            countdownEl.style.display = "block";
+            updateCountdown(seconds);
+            
+            const interval = setInterval(() => {
+                seconds--;
+                updateCountdown(seconds);
+                if (seconds <= 0) clearInterval(interval);
+            }, 1000);
+        }
+
+        function updateCountdown(seconds) {
+            let hours = Math.floor(seconds / 3600);
+            let minutes = Math.floor((seconds % 3600) / 60);
+            let secs = seconds % 60;
+            countdownEl.textContent = `Te espero en mi casa antes de: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
